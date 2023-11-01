@@ -1,0 +1,66 @@
+import gymnasium as gym
+from gymnasium import spaces
+import numpy as np
+
+
+class DialogueManagerEnv(gym.Env):
+    def __init__(self):
+        super(DialogueManagerEnv, self).__init__()
+
+        # 0: Ask for clarification, 1: Respond with an answer, 2: Give a list of answers
+        self.action_space = spaces.Discrete(3)
+        max_sentences = 200
+        vector_size = 768
+        vector_amount = 12
+        max_emotions = 28
+
+        self.observation_space = spaces.Dict({
+            'sentences': spaces.Box(low=-np.inf, high=np.inf, shape=(vector_size, vector_amount, max_sentences)),
+            'emotions': spaces.Tuple([spaces.Dict({
+                emotion: spaces.Box(low=0, high=1, shape=(1,))
+                for emotion in range(max_emotions)
+            })])
+        })
+
+        self.state = {
+            'sentences': [],
+            'emotions': []
+        }
+
+        self.done = False
+
+    def step(self, action, new_sentence=None, new_emotions=None):
+        if self.done:
+            raise Exception("Environment is already done. Call reset to start a new episode.")
+
+        self.state['sentences'].append(new_sentence)
+        self.state['emotions'].append(new_emotions)
+
+        # return self.state, 0, self.done, {}
+        return self.state, self.done
+
+    def calculate_reward(self, action, correct_action):
+        if action == correct_action:
+            # If the actions match, provide a positive reward
+            reward = 1.0
+        else:
+            # If the actions do not match, provide a negative reward
+            reward = -1.0
+        return reward
+
+    def reset(self, seed=None, options=None):
+        # We need the following line to seed self.np_random
+        super().reset(seed=seed)
+
+        sentences = []
+        emotions = []
+
+        # Return the initial observation
+        observation = {
+            # 'last_sentence': last_sentence,
+            # 'last_emotions': last_emotions,
+            'sentences': sentences,
+            'emotions': emotions,
+        }
+
+        return observation
