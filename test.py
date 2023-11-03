@@ -51,49 +51,49 @@ class DQN(nn.Module):
 
 
 env = DialogueManagerEnv()
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 observation = env.reset()
 n_observations = len(observation)
-
-print(observation)
-
-action = random.randint(1, 3)
-new_sentence = 'Here is a sentence.'
-new_emotions = {'neutral': 0.9488840103149414, 'approval': 0.04927210882306099, 'realization': 0.01524870004504919,
-                'optimism': 0.007397462613880634, 'annoyance': 0.004410946741700172,
-                'confusion': 0.0038724469486624002, 'disapproval': 0.0034067267552018166,
-                'admiration': 0.002833909122273326, 'disappointment': 0.0022627972066402435,
-                'desire': 0.001386463176459074, 'curiosity': 0.001385977491736412, 'caring': 0.0013623429695144296,
-                'love': 0.0013163670664653182, 'disgust': 0.0012667339760810137, 'amusement': 0.0011411334853619337,
-                'sadness': 0.0010983888059854507, 'anger': 0.0009471763041801751, 'excitement': 0.0009354772046208382,
-                'fear': 0.0009152788552455604, 'joy': 0.0009133153362199664, 'gratitude': 0.0007278873817995191,
-                'surprise': 0.0005257704760879278, 'relief': 0.0003500702732708305, 'remorse': 0.0003163530782330781,
-                'embarrassment': 0.0003062635660171509, 'pride': 0.0002906423178501427,
-                'nervousness': 0.0002685450599528849, 'grief': 0.00024025565653573722}
-
-# RESHAPE THE INPUT INTO 1d VECTORS
-embeddings = []
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertModel.from_pretrained("bert-base-uncased")
-encoded_input = tokenizer(new_sentence, return_tensors='pt')
-
-output = model(**encoded_input)
-sentence_embedding = output['last_hidden_state'].squeeze().reshape(-1)
-
-emotion_values = values_list = [value for value in new_emotions.values()]
-
-observation, done = env.step(action, sentence_embedding, emotion_values)
 n_actions = env.action_space.n
 
-print(observation)
+# print(observation)
+#
+# action = random.randint(1, 3)
+# new_sentence = 'Here is a sentence.'
+# new_emotions = {'neutral': 0.9488840103149414, 'approval': 0.04927210882306099, 'realization': 0.01524870004504919,
+#                 'optimism': 0.007397462613880634, 'annoyance': 0.004410946741700172,
+#                 'confusion': 0.0038724469486624002, 'disapproval': 0.0034067267552018166,
+#                 'admiration': 0.002833909122273326, 'disappointment': 0.0022627972066402435,
+#                 'desire': 0.001386463176459074, 'curiosity': 0.001385977491736412, 'caring': 0.0013623429695144296,
+#                 'love': 0.0013163670664653182, 'disgust': 0.0012667339760810137, 'amusement': 0.0011411334853619337,
+#                 'sadness': 0.0010983888059854507, 'anger': 0.0009471763041801751, 'excitement': 0.0009354772046208382,
+#                 'fear': 0.0009152788552455604, 'joy': 0.0009133153362199664, 'gratitude': 0.0007278873817995191,
+#                 'surprise': 0.0005257704760879278, 'relief': 0.0003500702732708305, 'remorse': 0.0003163530782330781,
+#                 'embarrassment': 0.0003062635660171509, 'pride': 0.0002906423178501427,
+#                 'nervousness': 0.0002685450599528849, 'grief': 0.00024025565653573722}
+#
+# # RESHAPE THE INPUT INTO 1d VECTORS
+# embeddings = []
+# tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+# model = BertModel.from_pretrained("bert-base-uncased")
+# encoded_input = tokenizer(new_sentence, return_tensors='pt')
 
+# output = model(**encoded_input)
+# sentence_embedding = output['last_hidden_state'].squeeze().reshape(-1)
+#
+# emotion_values = values_list = [value for value in new_emotions.values()]
+#
+# observation, done = env.step(action, sentence_embedding, emotion_values)
+
+# print(observation)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 policy_net = DQN(n_actions).to(device)
 target_net = DQN(n_actions).to(device)
 target_net.load_state_dict(policy_net.state_dict())
 
-BATCH_SIZE = 128
-#BATCH_SIZE = 4
+BATCH_SIZE = 8
+#BATCH_SIZE = 128
 GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.05
@@ -157,15 +157,25 @@ def optimize_model():
     # state_batch = torch.cat([preprocess_item(state) for state in batch.state])
     # action_batch = torch.cat(batch.action)
     # reward_batch = torch.cat(batch.reward)
-    non_final_next_states = [preprocess_item(item) for item in batch.next_state if item is not None]
-    state_batch = [preprocess_item(state) for state in batch.state]
-    action_batch = batch.action
+    #non_final_next_states = [preprocess_item(item) for item in batch.next_state if item is not None]
+    non_final_next_states_list = [preprocess_item(item) for item in batch.next_state if item is not None]
+    non_final_next_states = torch.stack(non_final_next_states_list)
+    # state_batch = [preprocess_item(state) for state in batch.state]
+
+    state_list = [preprocess_item(cur_state) for cur_state in batch.state]
+
+    state_batch = torch.stack(state_list).to(device)
+
+    #action_batch = batch.action
+    action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward, dim=0)
     # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
     # columns of actions taken. These are the actions which would've been taken
     # for each batch state according to policy_net
     #state_action_values = policy_net(state_batch).gather(1, action_batch)
-    state_action_values = torch.stack([policy_net(cur_state).argmax() for cur_state in state_batch]).view(-1, 1).float().requires_grad_()
+
+    state_action_values = policy_net(state_batch).gather(1, action_batch)
+    #state_action_values = torch.stack([policy_net(cur_state).argmax() for cur_state in state_batch]).view(-1, 1).float().requires_grad_()
 
     # Compute V(s_{t+1}) for all next states.
     # Expected values of actions for non_final_next_states are computed based
@@ -174,26 +184,22 @@ def optimize_model():
     # state value or 0 in case the state was final.
     next_state_values = torch.zeros(BATCH_SIZE, device=device)
     with torch.no_grad():
-        #next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0]
-        for i, next_state in enumerate(non_final_next_states):
-            if next_state is not None:
-                next_state_values[i] = target_net(next_state).argmax().view(1, 1)
-
-    next_state_values = next_state_values.view(-1, 1)  # Reshape to (BATCH_SIZE, 1)
+        next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0]
+        # for i, next_state in enumerate(non_final_next_states):
+        #     if next_state is not None:
+                #next_state_values[i] = target_net(next_state).argmax().view(1, 1)
 
     # Compute the expected Q values
     expected_state_action_values = ((next_state_values * GAMMA) + reward_batch).requires_grad_()
 
     # Compute Huber loss
     criterion = nn.SmoothL1Loss()
-    #loss = criterion(state_action_values, expected_state_action_values.unsqueeze(1))
     loss = criterion(state_action_values, expected_state_action_values)
 
     # Optimize the model
     optimizer.zero_grad()
     loss.backward()
     # In-place gradient clipping
-    temp = policy_net.parameters()
     #torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
     if any(param.grad is not None for param in policy_net.parameters()):
         torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
