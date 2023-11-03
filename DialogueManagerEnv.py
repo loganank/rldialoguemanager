@@ -36,7 +36,11 @@ class DialogueManagerEnv(gym.Env):
         self.state['sentences'].append(new_sentence)
         self.state['emotions'].append(new_emotions)
 
-        # return self.state, 0, self.done, {}
+        # Keep only the most recent 3 sentences
+        self.state['sentences'] = self.state['sentences'][-3:]
+        self.state['emotions'] = self.state['emotions'][-3:]
+
+    # return self.state, 0, self.done, {}
         return self.state, self.done
 
     def calculate_reward(self, action, correct_action):
