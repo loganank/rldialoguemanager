@@ -1,0 +1,2 @@
+# Run flask app with the command: flask --app server run
+# To run in debug mode, run: flask --app server run --debug
