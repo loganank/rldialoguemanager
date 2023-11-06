@@ -1,5 +1,3 @@
-import os, sys
-
 from iu import SimpleTextIU
 
 from BERTEmbeddingModule import BERTEmbeddingModule
@@ -8,33 +6,32 @@ from RLDialogueManagerModule import RLDialogueManagerModule
 
 from retico_core.debug import DebugModule
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/home/logan/Projects/CS497/googlespeechtotextkey.json'
-
 be = BERTEmbeddingModule()
 er = EmotionRecognitionModule()
-#dm = RLDialogueManagerModule()
+dm = RLDialogueManagerModule()
 # debug = DebugModule(print_payload_only=True)
 debug = DebugModule()
 
-be.subscribe(debug)
-er.subscribe(debug)
+be.subscribe(dm)
+er.subscribe(dm)
+dm.subscribe(debug)
 #dm.subscribe(debug)
 
-#be.run()
+be.run()
 er.run()
-#dm.run()
+dm.run()
 debug.run()
 
-input = 'This will be interpreted by the reinforcement learning model.'
+user_input = 'This will be interpreted by the reinforcement learning model.'
 
-iu = SimpleTextIU(previous_iu=None, iuid=1, text=input)
-#be.process_iu(iu)
+# increment iuid every time so it's unique
+iu = SimpleTextIU(previous_iu=None, iuid=1, text=user_input)
+be.process_iu(iu)
 er.process_iu(iu)
-#dm.process_iu(iu)
 
-#input()
+input()
 
-#be.stop()
+be.stop()
 er.stop()
-#dm.stop()
+dm.stop()
 debug.stop()

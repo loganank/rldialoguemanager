@@ -41,19 +41,18 @@ class BERTEmbeddingModule(abstract.AbstractModule):
     def process_iu(self, input_iu):
         encoded_input = self.tokenizer(input_iu.get_text(), return_tensors='pt')
         output = self.model(**encoded_input)
-        embedding = output['last_hidden_state'].squeeze()
+        embedding = output['last_hidden_state'].squeeze().reshape(-1)
 
         # create iu from embedding
         self.embeddings.append(embedding)
         new_iu = self.create_iu(input_iu)
         new_iu.creator = BERTEmbeddingModule
         new_iu.payload = embedding
-        print(new_iu.payload)
 
         update_iu = abstract.UpdateMessage.from_iu(new_iu, abstract.UpdateType.ADD)
         self.append(update_iu)  # pass iu to next module
 
-    def revoke(self, input_iu):
+    def process_revoke(self, input_iu):
         self.embeddings.pop()
 
     def start(self):

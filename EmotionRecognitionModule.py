@@ -1,6 +1,6 @@
 from retico_core import abstract
 from retico_core.text import TextIU
-from iu import SimpleTextIU
+from iu import EmotionsIU
 
 from transformers import pipeline
 
@@ -21,7 +21,7 @@ class EmotionRecognitionModule(abstract.AbstractModule):
 
     @staticmethod
     def output_iu():
-        return SimpleTextIU
+        return EmotionsIU
 
     def __init__(self, **kwargs):
         """Initializes the Emotion Recognition Module."""
@@ -29,7 +29,7 @@ class EmotionRecognitionModule(abstract.AbstractModule):
         self.emotions = []
         self.classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
 
-    def process_update(self,update_message):
+    def process_update(self, update_message):
         for iu, um in update_message:
             print(um)
             if um == abstract.UpdateType.ADD:
@@ -40,23 +40,19 @@ class EmotionRecognitionModule(abstract.AbstractModule):
     def process_iu(self, input_iu):
         # run text through model to find emotions
         model_output = self.classifier([input_iu.get_text()])[0]
-        # Turn the output into a dictionary
 
-        emotion_scores = {}
+        # Only keep values
+        emotion_values = [emotion['score'] for emotion in model_output]
 
-        for emotion in model_output:
-            emotion_scores[emotion['label']] = emotion['score']
-
-        # create iu from those emotion scores
-        self.emotions.append(emotion_scores)
+        # create iu
+        self.emotions.append(emotion_values)
         new_iu = self.create_iu(input_iu)
-        new_iu.payload = emotion_scores
-        print(new_iu.payload)
+        new_iu.payload = emotion_values
 
         update_iu = abstract.UpdateMessage.from_iu(new_iu, abstract.UpdateType.ADD)
         self.append(update_iu)  # pass iu to next module
 
-    def revoke(self, input_iu):
+    def process_revoke(self, input_iu):
         self.emotions.pop()
 
     def start(self):

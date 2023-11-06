@@ -146,7 +146,7 @@ class RLModel:
         self.last_emotions = new_emotions
         self.last_action = self.select_action(self.env.state)
 
-        return self.last_action
+        return self.last_action[0, 0].item()
 
     # has to come directly after process message
     def process_reward(self, correct_action):

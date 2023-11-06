@@ -182,7 +182,7 @@ for i_episode in range(num_episodes):
 
         output = model(**encoded_input)
         new_sentence = output['last_hidden_state'].squeeze().reshape(-1)
-        new_emotions = values_list = [value for value in new_emotions.values()]
+        new_emotions = [value for value in new_emotions.values()]
 
         observation, done = env.step(action, new_sentence, new_emotions)
         # TODO wait for user input to calculate reward
