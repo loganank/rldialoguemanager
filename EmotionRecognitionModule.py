@@ -31,7 +31,6 @@ class EmotionRecognitionModule(abstract.AbstractModule):
 
     def process_update(self, update_message):
         for iu, um in update_message:
-            print(um)
             if um == abstract.UpdateType.ADD:
                 self.process_iu(iu)
             elif um == abstract.UpdateType.REVOKE:

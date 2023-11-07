@@ -16,10 +16,11 @@ class DialogueManagerEnv(gym.Env):
 
         self.observation_space = spaces.Dict({
             'sentences': spaces.Box(low=-np.inf, high=np.inf, shape=(vector_size, vector_amount, max_sentences)),
-            'emotions': spaces.Tuple([spaces.Dict({
-                emotion: spaces.Box(low=0, high=1, shape=(1,))
-                for emotion in range(max_emotions)
-            })])
+            'emotions': spaces.Box(low=0, high=1, shape=(max_emotions,)),
+            # 'emotions': spaces.Tuple([spaces.Dict({
+            #     emotion: spaces.Box(low=0, high=1, shape=(1,))
+            #     for emotion in range(max_emotions)
+            # })])
         })
 
         self.state = {

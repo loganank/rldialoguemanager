@@ -30,7 +30,6 @@ class RLDialogueManagerModule(abstract.AbstractModule):
 
     def process_update(self, update_message):
         for iu, um in update_message:
-            print(um)
             if um == abstract.UpdateType.ADD:
                 self.process_iu(iu)
             elif um == abstract.UpdateType.REVOKE:
@@ -49,17 +48,16 @@ class RLDialogueManagerModule(abstract.AbstractModule):
             else:
                 emotions_embedding = storedIU.get_emotions()  # get emotions
                 bert_embedding = input_iu.get_embeddings()
-            del self.storedIUs[input_iu.grounded_in.iuid] # remove so dictionary doesn't get excessively large
+            del self.storedIUs[input_iu.grounded_in.iuid]  # remove so dictionary doesn't get excessively large
             dm_decision = self.rl_model.process_message(bert_embedding, emotions_embedding)
         else:
             self.storedIUs[input_iu.grounded_in.iuid] = input_iu
         if dm_decision is not None:
-            print(dm_decision)
-        new_iu = self.create_iu(input_iu)
-        new_iu.payload = input_iu.get_embeddings()
-        print(new_iu.payload)
-        update_iu = abstract.UpdateMessage.from_iu(new_iu, abstract.UpdateType.ADD)
-        self.append(update_iu)  # pass iu to next module
+            print("dm decision", dm_decision)
+            new_iu = self.create_iu(input_iu)
+            new_iu.payload = dm_decision
+            update_iu = abstract.UpdateMessage.from_iu(new_iu, abstract.UpdateType.ADD)
+            self.append(update_iu)  # pass iu to next module
 
     def process_revoke(self, input_iu):
         self.words.pop()

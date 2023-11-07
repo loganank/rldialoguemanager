@@ -43,12 +43,6 @@ class DQN(nn.Module):
         return self.layer3(x)
 
 
-def preprocess_item(item):
-    emotions = torch.tensor(item['emotions'][0], dtype=torch.float32, device=RLModel.device)
-    sentences = item['sentences'][0].to(RLModel.device)
-    return torch.cat((emotions, sentences), dim=0)
-
-
 class RLModel:
 
     BATCH_SIZE = 8
@@ -86,7 +80,7 @@ class RLModel:
             with torch.no_grad():
                 # second column on max result is index of where max element was
                 # found, so we pick action with the larger expected reward.
-                return self.policy_net(preprocess_item(cur_state)).argmax().view(1, 1)
+                return self.policy_net(cur_state).argmax().view(1, 1)
         # EXPLORE
         else:
             # pick a random action
@@ -103,10 +97,10 @@ class RLModel:
         # (a final state would've been the one after which simulation ended)
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                                 batch.next_state)), device=RLModel.device, dtype=torch.bool)
-        non_final_next_states_list = [preprocess_item(item) for item in batch.next_state if item is not None]
+        non_final_next_states_list = [item for item in batch.next_state if item is not None]
         non_final_next_states = torch.stack(non_final_next_states_list)
 
-        state_list = [preprocess_item(cur_state) for cur_state in batch.state]
+        state_list = [cur_state for cur_state in batch.state]
         state_batch = torch.stack(state_list).to(RLModel.device)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward, dim=0)
