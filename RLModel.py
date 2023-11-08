@@ -31,7 +31,7 @@ class DQN(nn.Module):
 
     def __init__(self, num_actions):
         super(DQN, self).__init__()
-        self.layer1 = nn.Linear(5404, 128)
+        self.layer1 = nn.Linear(4636, 128)
         self.layer2 = nn.Linear(128, 16)
         self.layer3 = nn.Linear(16, num_actions)
 
@@ -44,8 +44,8 @@ class DQN(nn.Module):
 
 
 def preprocess_item(item):
-    sentences = item['sentences'].to(RLModel.device)
-    emotions = item['emotions'].to(RLModel.device)
+    sentences = item['sentences'][0].to(RLModel.device)
+    emotions = item['emotions'][0].to(RLModel.device)
     return torch.cat((sentences, emotions), dim=0)
 
 

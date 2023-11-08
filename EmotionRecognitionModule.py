@@ -43,7 +43,7 @@ class EmotionRecognitionModule(abstract.AbstractModule):
         model_output = self.classifier([input_iu.get_text()])[0]
 
         # Only keep values
-        emotion_values = torch.tensor([emotion['score'] for emotion in model_output], device=self.device)
+        emotion_values = torch.tensor([emotion['score'] for emotion in model_output], dtype=torch.float32, device=self.device)
 
         # create iu
         self.emotions.append(emotion_values)
