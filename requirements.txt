@@ -6,12 +6,14 @@ _openmp_mutex=5.1=1_gnu
 asttokens=2.0.5=pyhd3eb1b0_0
 backcall=0.2.0=pyhd3eb1b0_0
 blas=1.0=mkl
+blinker=1.7.0=pypi_0
 brotli-python=1.0.9=py38h6a678d5_7
 bzip2=1.0.8=h7b6447c_0
 ca-certificates=2023.08.22=h06a4308_0
 certifi=2023.7.22=py38h06a4308_0
 cffi=1.15.1=py38h5eee18b_3
 charset-normalizer=2.0.4=pyhd3eb1b0_0
+click=8.1.7=pypi_0
 cloudpickle=3.0.0=pypi_0
 contourpy=1.1.1=pypi_0
 cryptography=41.0.3=py38hdda0065_0
@@ -27,6 +29,7 @@ executing=0.8.3=pyhd3eb1b0_0
 farama-notifications=0.0.4=pypi_0
 ffmpeg=4.3=hf484d3e_0
 filelock=3.9.0=py38h06a4308_0
+flask=3.0.0=pypi_0
 fonttools=4.43.1=pypi_0
 freetype=2.12.1=h4a9f257_0
 fsspec=2023.10.0=pypi_0
@@ -41,6 +44,7 @@ importlib-metadata=6.8.0=pypi_0
 importlib-resources=6.1.0=pypi_0
 intel-openmp=2023.1.0=hdb19cb5_46305
 ipython=8.12.2=py38h06a4308_0
+itsdangerous=2.1.2=pypi_0
 jedi=0.18.1=py38h06a4308_1
 jinja2=3.1.2=py38h06a4308_0
 jpeg=9e=h5eee18b_1
@@ -136,6 +140,7 @@ transformers=4.34.1=pypi_0
 typing_extensions=4.7.1=py38h06a4308_0
 urllib3=1.26.18=py38h06a4308_0
 wcwidth=0.2.5=pyhd3eb1b0_0
+werkzeug=3.0.1=pypi_0
 wheel=0.41.2=py38h06a4308_0
 xz=5.4.2=h5eee18b_0
 yaml=0.2.5=h7b6447c_0

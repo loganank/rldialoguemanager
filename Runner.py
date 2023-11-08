@@ -1,4 +1,4 @@
-from retico_core import IncrementalQueue
+from retico_core import IncrementalQueue, abstract
 
 from iu import SimpleTextIU
 from BERTEmbeddingModule import BERTEmbeddingModule
@@ -41,4 +41,9 @@ class Runner:
         self.process_message(message)
 
         decision = self.decision_queue.get()  # This might block until response is available
-        return decision.get_text()
+        for iu, um in decision:
+            if um == abstract.UpdateType.ADD:
+                print('add')
+            elif um == abstract.UpdateType.REVOKE:
+                print('revoke')
+        return iu.payload

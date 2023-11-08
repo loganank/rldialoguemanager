@@ -53,7 +53,6 @@ class RLDialogueManagerModule(abstract.AbstractModule):
         else:
             self.storedIUs[input_iu.grounded_in.iuid] = input_iu
         if dm_decision is not None:
-            print("dm decision", dm_decision)
             new_iu = self.create_iu(input_iu)
             new_iu.payload = dm_decision
             update_iu = abstract.UpdateMessage.from_iu(new_iu, abstract.UpdateType.ADD)
