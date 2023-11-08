@@ -1,6 +1,7 @@
 from retico_core import abstract
 from retico_core.text import TextIU
 from iu import EmotionsIU
+import torch
 
 from transformers import pipeline
 
@@ -27,6 +28,7 @@ class EmotionRecognitionModule(abstract.AbstractModule):
         """Initializes the Emotion Recognition Module."""
         super().__init__(**kwargs)
         self.emotions = []
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
 
     def process_update(self, update_message):
@@ -41,7 +43,7 @@ class EmotionRecognitionModule(abstract.AbstractModule):
         model_output = self.classifier([input_iu.get_text()])[0]
 
         # Only keep values
-        emotion_values = [emotion['score'] for emotion in model_output]
+        emotion_values = torch.tensor([emotion['score'] for emotion in model_output], device=self.device)
 
         # create iu
         self.emotions.append(emotion_values)

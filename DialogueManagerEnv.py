@@ -10,17 +10,12 @@ class DialogueManagerEnv(gym.Env):
         # 0: Ask for clarification, 1: Respond with an answer, 2: Give a list of answers
         self.action_space = spaces.Discrete(3)
         max_sentences = 200
-        vector_size = 768
-        vector_amount = 12
+        vector_size = 5404
         max_emotions = 28
 
         self.observation_space = spaces.Dict({
-            'sentences': spaces.Box(low=-np.inf, high=np.inf, shape=(vector_size, vector_amount, max_sentences)),
+            'sentences': spaces.Box(low=-np.inf, high=np.inf, shape=(vector_size, max_sentences)),
             'emotions': spaces.Box(low=0, high=1, shape=(max_emotions,)),
-            # 'emotions': spaces.Tuple([spaces.Dict({
-            #     emotion: spaces.Box(low=0, high=1, shape=(1,))
-            #     for emotion in range(max_emotions)
-            # })])
         })
 
         self.state = {
@@ -41,7 +36,6 @@ class DialogueManagerEnv(gym.Env):
         self.state['sentences'] = self.state['sentences'][-3:]
         self.state['emotions'] = self.state['emotions'][-3:]
 
-    # return self.state, 0, self.done, {}
         return self.state, self.done
 
     def calculate_reward(self, action, correct_action):
@@ -62,8 +56,6 @@ class DialogueManagerEnv(gym.Env):
 
         # Return the initial observation
         observation = {
-            # 'last_sentence': last_sentence,
-            # 'last_emotions': last_emotions,
             'sentences': sentences,
             'emotions': emotions,
         }

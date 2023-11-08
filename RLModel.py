@@ -43,6 +43,12 @@ class DQN(nn.Module):
         return self.layer3(x)
 
 
+def preprocess_item(item):
+    sentences = item['sentences'].to(RLModel.device)
+    emotions = item['emotions'].to(RLModel.device)
+    return torch.cat((sentences, emotions), dim=0)
+
+
 class RLModel:
 
     BATCH_SIZE = 8
@@ -80,7 +86,7 @@ class RLModel:
             with torch.no_grad():
                 # second column on max result is index of where max element was
                 # found, so we pick action with the larger expected reward.
-                return self.policy_net(cur_state).argmax().view(1, 1)
+                return self.policy_net(preprocess_item(cur_state)).argmax().view(1, 1)
         # EXPLORE
         else:
             # pick a random action
@@ -97,10 +103,10 @@ class RLModel:
         # (a final state would've been the one after which simulation ended)
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                                 batch.next_state)), device=RLModel.device, dtype=torch.bool)
-        non_final_next_states_list = [item for item in batch.next_state if item is not None]
+        non_final_next_states_list = [preprocess_item(item) for item in batch.next_state if item is not None]
         non_final_next_states = torch.stack(non_final_next_states_list)
 
-        state_list = [cur_state for cur_state in batch.state]
+        state_list = [preprocess_item(cur_state) for cur_state in batch.state]
         state_batch = torch.stack(state_list).to(RLModel.device)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward, dim=0)
@@ -136,8 +142,9 @@ class RLModel:
 
     # can't call again before calling process_reward
     def process_message(self, new_sentence, new_emotions):
-        self.last_sentence = new_sentence
-        self.last_emotions = new_emotions
+        # add message to the state before performing action
+        self.env.step(self.env.action_space.sample(), new_sentence, new_emotions)
+
         self.last_action = self.select_action(self.env.state)
 
         return self.last_action[0, 0].item()
@@ -149,8 +156,6 @@ class RLModel:
             reward = torch.tensor(1, device=RLModel.device).view(1, 1)
         else:
             reward = torch.tensor(-1, device=RLModel.device).view(1, 1)
-
-        self.env.step(self.last_action, self.last_sentence, self.last_emotions)
 
         # Store the transition in memory
         # the next state will be the same as the current state

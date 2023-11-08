@@ -43,13 +43,13 @@ class RLDialogueManagerModule(abstract.AbstractModule):
             # TODO both ius are present, pass to model
             storedIU = self.storedIUs[input_iu.grounded_in.iuid]
             if isinstance(storedIU, BERTEmbeddingIU):
-                bert_embedding = storedIU.get_embeddings()  # get bert embedding
-                emotions_embedding = input_iu.get_emotions()
+                bert_embedding = storedIU.payload  # get bert embedding
+                emotions_embedding = input_iu.payload  # get emotions
             else:
-                emotions_embedding = storedIU.get_emotions()  # get emotions
-                bert_embedding = input_iu.get_embeddings()
-            del self.storedIUs[input_iu.grounded_in.iuid]  # remove so dictionary doesn't get excessively large
+                emotions_embedding = storedIU.payload  # get emotions
+                bert_embedding = input_iu.payload  # get bert embedding
             dm_decision = self.rl_model.process_message(bert_embedding, emotions_embedding)
+            del self.storedIUs[input_iu.grounded_in.iuid]  # remove so dictionary doesn't get excessively large
         else:
             self.storedIUs[input_iu.grounded_in.iuid] = input_iu
         if dm_decision is not None:
