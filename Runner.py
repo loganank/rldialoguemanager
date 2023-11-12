@@ -47,3 +47,6 @@ class Runner:
             elif um == abstract.UpdateType.REVOKE:
                 print('revoke')
         return iu.payload
+
+# runner = Runner()
+# print(runner.get_dm_decision("this is a test"))

@@ -2,7 +2,8 @@ from retico_core import abstract
 from iu import SimpleTextIU
 from iu import BERTEmbeddingIU
 
-from transformers import BertTokenizer, BertModel
+#from transformers import BertTokenizer, BertModel
+from transformers import DistilBertTokenizer, DistilBertModel
 from transformers import pipeline
 
 class BERTEmbeddingModule(abstract.AbstractModule):
@@ -27,8 +28,12 @@ class BERTEmbeddingModule(abstract.AbstractModule):
         """Initializes the BERT Embedding Module."""
         super().__init__(**kwargs)
         self.embeddings = []
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        self.model = BertModel.from_pretrained("bert-base-uncased")
+        #model_string = "bert-base-uncased"
+        model_string = "distilbert-base-uncased"
+        #self.tokenizer = BertTokenizer.from_pretrained(model_string)
+        #self.model = BertModel.from_pretrained(model_string)
+        self.tokenizer = DistilBertTokenizer.from_pretrained(model_string)
+        self.model = DistilBertModel.from_pretrained(model_string)
 
     def process_update(self, update_message):
         for iu, um in update_message:
