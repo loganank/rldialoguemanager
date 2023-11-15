@@ -25,7 +25,7 @@ class RLDialogueManagerModule(abstract.AbstractModule):
     def __init__(self, **kwargs):
         """Initializes the Reinforcement Learning Dialogue Manager Module."""
         super().__init__(**kwargs)
-        self.rl_model = RLModel()
+        self.rl_model = RLModel("saved_models/")
         self.storedIUs = {}
 
     def process_update(self, update_message):

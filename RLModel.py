@@ -1,4 +1,5 @@
 import math
+import os
 import random
 from collections import namedtuple, deque
 import torch
@@ -59,16 +60,27 @@ class RLModel:
     TAU = 0.005
     LR = 1e-4
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    policy_net_file_name = "policy_model.pth"
+    target_net_file_name = "target_model.pth"
 
-    def __init__(self):
+    def __init__(self, model_path=None):
         self.env = DialogueManagerEnv()
 
         self.env.reset()
         n_actions = self.env.action_space.n
 
+        self.model_path = model_path
         self.policy_net = DQN(n_actions).to(RLModel.device)
         self.target_net = DQN(n_actions).to(RLModel.device)
-        self.target_net.load_state_dict(self.policy_net.state_dict())
+
+        if self.model_path is not None and os.path.exists(self.model_path + RLModel.policy_net_file_name):
+            print("Load models")
+            self.policy_net.load_state_dict(torch.load(self.model_path + RLModel.policy_net_file_name))
+            self.target_net.load_state_dict(torch.load(self.model_path + RLModel.target_net_file_name))
+        else:
+            print("Don't load models")
+            self.target_net.load_state_dict(self.policy_net.state_dict())
+
         self.optimizer = optim.AdamW(self.policy_net.parameters(), lr=RLModel.LR, amsgrad=True)
         self.memory = ReplayMemory(10000)
         self.steps_done = 0
@@ -175,3 +187,7 @@ class RLModel:
             target_net_state_dict[key] = (policy_net_state_dict[key] * RLModel.TAU +
                                           target_net_state_dict[key] * (1 - RLModel.TAU))
         self.target_net.load_state_dict(target_net_state_dict)
+
+        if self.model_path is not None:
+            torch.save(self.policy_net.state_dict(), self.model_path + RLModel.policy_net_file_name)
+            torch.save(self.target_net.state_dict(), self.model_path + RLModel.target_net_file_name)
