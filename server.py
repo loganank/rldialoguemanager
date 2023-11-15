@@ -7,6 +7,7 @@ CORS(app)
 
 runner = Runner()
 
+
 @app.route('/sendMessage', methods=['POST'])
 def send_message():
     # To send a curl to this endpoint do
@@ -15,8 +16,7 @@ def send_message():
     request_json = request.get_json()
     user_message = request_json
     print('user_message:', user_message)
-    # TODO pass message to retico
-    # Process the user's message and wait for the response
+    # pass correct decision to retico and wait for the response
     decision = runner.get_dm_decision(user_message)
 
     # return json object
@@ -33,8 +33,7 @@ def send_correct_decision():
     request_json = request.get_json()
     correct_decision = request_json
     print('correct decision:', correct_decision)
-    # TODO pass message to retico
-    # Process the user's message and wait for the response
+    # TODO pass message to retico and wait for the response
     response = runner.get_dm_response(correct_decision)
 
     # return json object
