@@ -153,8 +153,10 @@ class RLModel:
     def process_reward(self, correct_action):
         # reward will be +1 if right, and -1 if wrong
         if correct_action == self.last_action:
+            print("decision was correct")
             reward = torch.tensor(1, device=RLModel.device).view(1, 1)
         else:
+            print ("decision was incorrect")
             reward = torch.tensor(-1, device=RLModel.device).view(1, 1)
 
         # Store the transition in memory

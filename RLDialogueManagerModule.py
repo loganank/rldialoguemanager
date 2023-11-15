@@ -36,11 +36,21 @@ class RLDialogueManagerModule(abstract.AbstractModule):
                 self.process_revoke(iu)
 
     def process_iu(self, input_iu):
-        # TODO do model stuff
-        # self.rl_model.process_message(new_sentence, new_emotions)
+
+        if isinstance(input_iu, SimpleTextIU):
+            # give the correct decision to the model, so it can calculate the reward for its last decision
+            print("SimpleTextIU payload", input_iu.payload)
+            dm_response = self.rl_model.process_reward(input_iu.payload)
+            # pass iu to next module
+            new_iu = self.create_iu(input_iu)
+            new_iu.payload = dm_response
+            update_iu = abstract.UpdateMessage.from_iu(new_iu, abstract.UpdateType.ADD)
+            self.append(update_iu)
+            return
+
         dm_decision = None
         if input_iu.grounded_in.iuid in self.storedIUs:
-            # TODO both ius are present, pass to model
+            # if both ius are present, pass to model
             storedIU = self.storedIUs[input_iu.grounded_in.iuid]
             if isinstance(storedIU, BERTEmbeddingIU):
                 bert_embedding = storedIU.payload  # get bert embedding
@@ -51,6 +61,7 @@ class RLDialogueManagerModule(abstract.AbstractModule):
             dm_decision = self.rl_model.process_message(bert_embedding, emotions_embedding)
             del self.storedIUs[input_iu.grounded_in.iuid]  # remove so dictionary doesn't get excessively large
         else:
+            # store bert or emotion embedding for when the second comes
             self.storedIUs[input_iu.grounded_in.iuid] = input_iu
         if dm_decision is not None:
             new_iu = self.create_iu(input_iu)
