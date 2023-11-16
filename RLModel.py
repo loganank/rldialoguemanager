@@ -32,7 +32,7 @@ class DQN(nn.Module):
 
     def __init__(self, num_actions):
         super(DQN, self).__init__()
-        self.layer1 = nn.Linear(4636, 128)
+        self.layer1 = nn.Linear(796, 128)
         self.layer2 = nn.Linear(128, 16)
         self.layer3 = nn.Linear(16, num_actions)
 

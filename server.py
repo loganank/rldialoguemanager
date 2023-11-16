@@ -18,6 +18,7 @@ def send_message():
     print('user_message:', user_message)
     # pass correct decision to retico and wait for the response
     decision = runner.get_dm_decision(user_message)
+    print('decision', decision)
 
     # return json object
     return {

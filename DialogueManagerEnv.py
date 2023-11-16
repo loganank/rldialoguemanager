@@ -10,7 +10,7 @@ class DialogueManagerEnv(gym.Env):
         # 0: Ask for clarification, 1: Respond with an answer, 2: Give a list of answers
         self.action_space = spaces.Discrete(3)
         max_sentences = 200
-        vector_size = 4608
+        vector_size = 768
         max_emotions = 28
 
         self.observation_space = spaces.Dict({

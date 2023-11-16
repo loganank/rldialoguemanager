@@ -39,7 +39,6 @@ class RLDialogueManagerModule(abstract.AbstractModule):
 
         if isinstance(input_iu, SimpleTextIU):
             # give the correct decision to the model, so it can calculate the reward for its last decision
-            print("SimpleTextIU payload", input_iu.payload)
             dm_response = self.rl_model.process_reward(input_iu.payload)
             # pass iu to next module
             new_iu = self.create_iu(input_iu)

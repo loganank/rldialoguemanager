@@ -45,7 +45,7 @@ class BERTEmbeddingModule(abstract.AbstractModule):
     def process_iu(self, input_iu):
         encoded_input = self.tokenizer(input_iu.get_text(), return_tensors='pt')
         output = self.model(**encoded_input)
-        embedding = output['last_hidden_state'].squeeze().reshape(-1)
+        embedding = output['last_hidden_state'].squeeze(dim=0).mean(dim=0)
 
         # create iu from embedding
         self.embeddings.append(embedding)
