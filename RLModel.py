@@ -138,7 +138,7 @@ class RLModel:
             next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0]
 
         # Compute the expected Q values
-        expected_state_action_values = ((next_state_values * RLModel.GAMMA) + reward_batch).requires_grad_()
+        expected_state_action_values = (next_state_values * RLModel.GAMMA) + reward_batch
 
         # Compute Huber loss
         criterion = nn.SmoothL1Loss()

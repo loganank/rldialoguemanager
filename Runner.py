@@ -4,7 +4,6 @@ from iu import SimpleTextIU
 from BERTEmbeddingModule import BERTEmbeddingModule
 from EmotionRecognitionModule import EmotionRecognitionModule
 from RLDialogueManagerModule import RLDialogueManagerModule
-import pandas as pd
 
 
 class Runner:
@@ -21,8 +20,6 @@ class Runner:
         self.be.run()
         self.er.run()
         self.dm.run()
-        self.last_message = None
-        self.last_decision = None
 
         # A variable to store the response
         self.module_response = None
@@ -61,8 +58,6 @@ class Runner:
                 print('add')
             elif um == abstract.UpdateType.REVOKE:
                 print('revoke')
-        self.last_message = message
-        self.last_decision = iu.payload
         return iu.payload
         
 
@@ -79,13 +74,6 @@ class Runner:
                 print('add')
             elif um == abstract.UpdateType.REVOKE:
                 print('revoke')
-        data = {
-            'Message': [self.last_message],
-            'Decision': [self.last_decision],
-            'Correct_Decision': [correct_decision]
-        }
-        df = pd.DataFrame(data)
-        df.to_csv('user_data.csv', mode='a', index=False, header=False)
         return iu.payload
 
 # runner = Runner()
