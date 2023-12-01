@@ -52,7 +52,7 @@ def preprocess_item(item):
 
 class RLModel:
 
-    BATCH_SIZE = 8
+    BATCH_SIZE = 10
     GAMMA = 0.99
     EPS_START = 0.9
     EPS_END = 0.05
@@ -138,7 +138,7 @@ class RLModel:
             next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0]
 
         # Compute the expected Q values
-        expected_state_action_values = (next_state_values * RLModel.GAMMA) + reward_batch
+        expected_state_action_values = (next_state_values.view(-1, 1) * RLModel.GAMMA) + reward_batch
 
         # Compute Huber loss
         criterion = nn.SmoothL1Loss()
@@ -168,7 +168,7 @@ class RLModel:
             print("decision was correct")
             reward = torch.tensor(1, device=RLModel.device).view(1, 1)
         else:
-            print ("decision was incorrect")
+            print("decision was incorrect")
             reward = torch.tensor(-1, device=RLModel.device).view(1, 1)
 
         # Store the transition in memory

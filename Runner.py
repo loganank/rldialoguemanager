@@ -76,5 +76,9 @@ class Runner:
                 print('revoke')
         return iu.payload
 
+
 # runner = Runner()
 # print(runner.get_dm_decision("this is a test"))
+# print(runner.get_dm_response(0))
+# print(runner.get_dm_decision("this is a test2"))
+# print(runner.get_dm_response(1))
