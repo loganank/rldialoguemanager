@@ -1,2 +1,5 @@
+# Using the requirements.txt file, install all required dependencies into an anaconda environment using:
+### $ conda create --name <env> --file requirements.txt
+
 # Run flask app with the command: flask --app server run
 # To run in debug mode, run: flask --app server run --debug
